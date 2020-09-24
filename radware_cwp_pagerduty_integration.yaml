@@ -40,7 +40,7 @@ Resources:
       Topics:
       - Ref: InputTopic
     Type: AWS::SNS::TopicPolicy
-  CwpPagerDutyFunction:
+  Solution:
     Properties:
       CodeUri: 
         Bucket: 
@@ -73,6 +73,6 @@ Resources:
   LambdaLogsLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${CwpPagerDutyFunction}"
+      LogGroupName: !Sub "/aws/lambda/${Solution}"
       RetentionInDays: 30
 Transform: AWS::Serverless-2016-10-31
