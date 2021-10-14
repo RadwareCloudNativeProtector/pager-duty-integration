@@ -4,10 +4,7 @@ Outputs:
     Description: 'SNS Topic ARN, destination for CWP Alerts'
     Value:
       Ref: InputTopic
-  PagerDutyLambdaFunction: 
-    Description: 'Name of the Lambda Function created'
-    Value: 
-      Ref: CwpPagerDutyFunction
+
 Parameters:
   PagerDutyIntegrationKey:
     Default: ''
@@ -21,6 +18,14 @@ Parameters:
     Default: '7,8,9,10'
     Description: 'REQUIRED - CWP risk scores which will trigger a PagerDuty alert (comma separated values: 1 through 10)'
     Type: String
+  CNPAccountId:
+    AllowedPattern: '[0-9]*'
+    MinLength: '12'
+    MaxLength: '12'
+    Type: String
+    Description: The automated response Radware account ID to send publish notifications to. specified at the portal under Settings -> Cloud Accounts -> (Automated response) Activate
+    Default: '438643506655'
+    
 Resources:
   InputTopic:
     Type: AWS::SNS::Topic
@@ -32,7 +37,8 @@ Resources:
         - Action: sns:Publish
           Effect: Allow
           Principal:
-            AWS: arn:aws:iam::342443945406:root
+            #AWS: arn:aws:iam::342443945406:root
+            AWS: !Join [ '' , [ 'arn:aws:iam::' , !Ref CNPAccountId , ':root'] ]
           Resource:
             Ref: InputTopic
           Sid: CwpSnsPolicy
@@ -43,11 +49,7 @@ Resources:
   Solution:
     Properties:
       CodeUri: 
-        Bucket: 
-          Fn::Join:
-          - ''
-          - - 'radware-cwp-devops-'
-            - !Ref 'AWS::Region'
+        Bucket: !Join [ '' , [ 'cnp-public-' , !Ref AWS::Region ] ]
           # If deploying CFT manually, replace this join with a string (e.g. "Bucket: my-custom-bucket-name"
         Key: 'radware_cwp_pagerduty_integration/radware_cwp_pagerduty_integration.zip'
         # Key is the name of the zip file which contains lambda_function.py
